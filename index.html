@@ -188,7 +188,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://hopenobug.github.com/2026/05/12/cpp-self-type/">
+    <link itemprop="mainEntityOfPage" href="https://hopenobug.github.com/read-pipe-timeout/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -202,7 +202,84 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2026/05/12/cpp-self-type/" class="post-title-link" itemprop="url">C++ 实现Self类型</a>
+            <a href="/read-pipe-timeout/" class="post-title-link" itemprop="url">read 读取管道超时不生效问题</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2026-05-17 10:02:17 / 修改时间：10:05:03" itemprop="dateCreated datePublished" datetime="2026-05-17T10:02:17+08:00">2026-05-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/bash/" itemprop="url" rel="index"><span itemprop="name">bash</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkfifo</span> /tmp/foo.pipe</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2s后不会自动结束， strace观察发现卡在open</span></span><br><span class="line"><span class="built_in">read</span> -t 2 line &lt; /tmp/foo.pipe</span><br><span class="line"></span><br><span class="line"><span class="comment"># 改成下面就行了 &lt;&gt; 表示将read的输入和输出都重定向</span></span><br><span class="line"><span class="built_in">read</span> -t 2 &lt;&gt;/tmp/foo.pipe</span><br><span class="line"></span><br><span class="line"><span class="comment"># 这样也可以</span></span><br><span class="line"><span class="built_in">exec</span> &#123;fd&#125;&lt;&gt;/tmp/foo.pipe</span><br><span class="line"><span class="built_in">read</span> -t 2 -u <span class="variable">$fd</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>其原因在于命名管道open行为比较特殊</p>
+<ol>
+<li><strong>只读模式，不带O_NONBLOCK</strong>：open会阻塞，直到另一个进程以写模式打开该命名管道</li>
+<li><strong>只写模式，不带O_NONBLOCK</strong>：open会阻塞，直到另一个进程以读模式打开该命名管道</li>
+<li><strong>只读模式，带O_NONBLOCK</strong>：open立即返回，不会阻塞 </li>
+<li><strong>只写模式，带O_NONBLOCK</strong>： open会返回错误，errno设置为 ENXIO，除非有其他进程已经以读模式打开了该命名管道</li>
+</ol>
+<p>这种机制确保了管道两端的同步建立，避免了数据传输过程中的不一致状态。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://hopenobug.github.com/cpp-self-type/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="hopenobug">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/cpp-self-type/" class="post-title-link" itemprop="url">C++ 实现Self类型</a>
         </h2>
 
         <div class="post-meta">
@@ -324,14 +401,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">1</span>
+          <span class="site-state-item-count">2</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">2</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
