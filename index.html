@@ -213,7 +213,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2026-06-16 21:03:32 / 修改时间：21:05:55" itemprop="dateCreated datePublished" datetime="2026-06-16T21:03:32+08:00">2026-06-16</time>
+              <time title="创建时间：2026-06-16 21:03:32 / 修改时间：22:01:43" itemprop="dateCreated datePublished" datetime="2026-06-16T21:03:32+08:00">2026-06-16</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -241,7 +241,7 @@
 <li>若引用限定符为<code>&amp;</code>,则表明<code>this</code>对象指向着左值对象</li>
 <li>若引用限定符为<code>&amp;&amp;</code>,则表明<code>this</code>对象指向着右值对象<br>引用限定符语法点:</li>
 <li>引用限定符必须同时出现在声明以及实现之后.</li>
-<li>引用限定符必须出现在’const限定符’之后;如:</li>
+<li>引用限定符必须出现在<code>const限定符</code>之后;如:</li>
 </ul>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">X</span> &#123;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">foo</span><span class="params">()</span> <span class="type">const</span> &amp;</span>; <span class="comment">// 正确.</span></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">bar</span><span class="params">()</span> &amp; <span class="type">const</span></span>; <span class="comment">// 错误!</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <ul>
