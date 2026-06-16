@@ -188,6 +188,94 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://hopenobug.github.com/cpp-req-qualifiers/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="hopenobug">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/cpp-req-qualifiers/" class="post-title-link" itemprop="url">引用限定符</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2026-06-16 21:03:32 / 修改时间：21:05:55" itemprop="dateCreated datePublished" datetime="2026-06-16T21:03:32+08:00">2026-06-16</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>可以在参数列表之后使用引用限定符来指定<code>this</code>对象的左值与右值属性;</p>
+<ul>
+<li>若引用限定符为<code>&amp;</code>,则表明<code>this</code>对象指向着左值对象</li>
+<li>若引用限定符为<code>&amp;&amp;</code>,则表明<code>this</code>对象指向着右值对象<br>引用限定符语法点:</li>
+<li>引用限定符必须同时出现在声明以及实现之后.</li>
+<li>引用限定符必须出现在’const限定符’之后;如:</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">X</span> &#123;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">foo</span><span class="params">()</span> <span class="type">const</span> &amp;</span>; <span class="comment">// 正确.</span></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">bar</span><span class="params">()</span> &amp; <span class="type">const</span></span>; <span class="comment">// 错误!</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>若引用限定符用于重载;则所有同名函数要么都带有引用限定符;要么都不带有引用限定符;不然会编译出错</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">X</span> &#123;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">foo</span><span class="params">()</span> &amp; </span>&#123;&#125; <span class="comment">// 1</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">foo</span><span class="params">()</span> &amp;&amp; </span>&#123;&#125;<span class="comment">// 2</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">X x;</span><br><span class="line">x.<span class="built_in">foo</span>(); <span class="comment">// 调用 foo1(),</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">X</span>().<span class="built_in">foo</span>(); <span class="comment">// 调用 foo2();</span></span><br></pre></td></tr></table></figure>
+
+<p>众所周知，range for里的临时变量左值有问题</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Keeper</span> &#123;  </span><br><span class="line">  std::vector&lt;<span class="type">int</span>&gt; data&#123;<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>&#125;;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  ~<span class="built_in">Keeper</span>() &#123; std::cout &lt;&lt; <span class="string">&quot;dtor\n&quot;</span>; &#125;</span><br><span class="line">  <span class="function"><span class="keyword">auto</span>&amp; <span class="title">items</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> data; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function">Keeper <span class="title">GetKeeper</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> &#123;&#125;;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Use</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">auto</span>&amp; item : <span class="built_in">GetKeeper</span>().<span class="built_in">items</span>()) &#123;</span><br><span class="line">    std::cout &lt;&lt; item &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>上面的item是无效的引用</p>
+<p>可以用引用限定符来改</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Keeper</span> &#123;</span><br><span class="line">  std::vector&lt;<span class="type">int</span>&gt; data&#123;<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>&#125;;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  ~<span class="built_in">Keeper</span>() &#123; std::cout &lt;&lt; <span class="string">&quot;dtor\n&quot;</span>; &#125;</span><br><span class="line">  <span class="function"><span class="keyword">auto</span>&amp; <span class="title">items</span><span class="params">()</span> &amp; </span>&#123; <span class="keyword">return</span> data; &#125;</span><br><span class="line">  <span class="function"><span class="keyword">auto</span> <span class="title">items</span><span class="params">()</span> &amp;&amp; </span>&#123; <span class="keyword">return</span> std::<span class="built_in">move</span>(data); &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>注意这两个items后面的&amp;限定，两种限定约定了被调用的时候走左还是右值，如果是range for循环，就调用第二个items，救一下data的生命，就没问题了。</p>
+<p>除了左值引用、右指引用， const volaile noexcept 都可以修饰成员函数， 表示对象被相应关键字修饰的时候，可以调用的成员函数， 这些关键字属于成员函数的类型的一部分 (noexcept 不能修饰对象， 只能修饰函数，表示函数不会抛出异常)</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://hopenobug.github.com/bash-curl/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -479,7 +567,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">4</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
