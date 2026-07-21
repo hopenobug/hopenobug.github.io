@@ -188,6 +188,83 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://hopenobug.github.com/cpp-concept-notes/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="hopenobug">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/cpp-concept-notes/" class="post-title-link" itemprop="url">c++ concept 备忘</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2026-07-21 19:10:25 / 修改时间：19:12:45" itemprop="dateCreated datePublished" datetime="2026-07-21T19:10:25+08:00">2026-07-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>C++20 引入的 concept（概念）是模板编程的一次重大革新。它允许你对模板参数施加编译时约束，明确指定一个类型必须具备哪些属性和行为。</p>
+<p>简单来说，concept 就像是模板参数的“接口”或“契约”。你可以定义一些规则，只有满足这些规则的类型，才能被用于特定的模板。</p>
+<p>concept 用法如下:</p>
+<p>可以在 if constexpr 中检查concept</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">checkBar</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">if</span> <span class="title">constexpr</span> <span class="params">(<span class="keyword">requires</span> &#123; <span class="keyword">typename</span> T::Bar; &#125;)</span></span></span><br><span class="line"><span class="function">        std::cout &lt;&lt; &quot;T has Bar of type: <span class="string">&quot; &lt;&lt; typeid(typename T::Bar).name() &lt;&lt; std::endl;</span></span></span><br><span class="line"><span class="string"><span class="function">    else</span></span></span><br><span class="line"><span class="string"><span class="function">        std::cout &lt;&lt; &quot;</span>T does not have Bar<span class="string">&quot; &lt;&lt; std::endl;</span></span></span><br><span class="line"><span class="string"><span class="function">&#125;</span></span></span><br><span class="line"><span class="string"><span class="function"></span></span></span><br><span class="line"><span class="string"><span class="function"></span></span></span><br><span class="line"><span class="string"><span class="function">template&lt;typename T&gt;</span></span></span><br><span class="line"><span class="string"><span class="function">concept HasBar = requires(T) &#123;</span></span></span><br><span class="line"><span class="string"><span class="function">    typename T::Bar;</span></span></span><br><span class="line"><span class="string"><span class="function">&#125;;</span></span></span><br><span class="line"><span class="string"><span class="function"></span></span></span><br><span class="line"><span class="string"><span class="function">template &lt;typename T&gt;</span></span></span><br><span class="line"><span class="string"><span class="function">void checkBar2() &#123;</span></span></span><br><span class="line"><span class="string"><span class="function">    if constexpr (HasBar&lt;T&gt;)</span></span></span><br><span class="line"><span class="string"><span class="function">        std::cout &lt;&lt; &quot;</span>T has Bar of type: <span class="string">&quot; &lt;&lt; typeid(typename T::Bar).name() &lt;&lt; std::endl;</span></span></span><br><span class="line"><span class="string"><span class="function">    else</span></span></span><br><span class="line"><span class="string"><span class="function">        std::cout &lt;&lt; &quot;</span>T does not have Bar<span class="string">&quot; &lt;&lt; std::endl;</span></span></span><br><span class="line"><span class="string"><span class="function">&#125;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>constexpr 约束 模版参数 或 auto decltype(auto)</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">concept</span> has_size = <span class="built_in">requires</span>(T t) &#123; t.<span class="built_in">size</span>(); &#125;; <span class="comment">// size 可以是静态/非静态的成员对象/成员函数</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;has_size T&gt; <span class="comment">// 用concept 代替 typename</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">(T t)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">(T t)</span></span></span><br><span class="line"><span class="function">    <span class="keyword">requires</span> has_size&lt;T&gt;</span>; <span class="comment">// requires 放函数名后</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">    <span class="keyword">requires</span> has_size&lt;T&gt; <span class="comment">// requires 放template后</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">(T t)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">(T t)</span></span></span><br><span class="line"><span class="function">    <span class="keyword">requires</span> <span class="title">requires</span><span class="params">(T t)</span> </span>&#123; t.<span class="built_in">size</span>(); &#125;; <span class="comment">// 就地约束，注意关键字被使用两次</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">(has_size <span class="keyword">auto</span> t)</span></span>; <span class="comment">// concept 放 auto 前面</span></span><br><span class="line"></span><br><span class="line"><span class="function">has_size <span class="keyword">decltype</span>(<span class="keyword">auto</span>) <span class="title">f</span><span class="params">(<span class="keyword">auto</span> t)</span></span>;</span><br><span class="line"><span class="function">has_size <span class="keyword">auto</span> <span class="title">f</span><span class="params">(<span class="keyword">auto</span> t)</span></span>; <span class="comment">// 约束返回值类型</span></span><br></pre></td></tr></table></figure>
+
+<p>concept 只检查声明，如果声明符合语法，但定义中存在问题，也可以通过检查</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">f</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">static_assert</span>(<span class="literal">false</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">concept</span> ok = <span class="keyword">requires</span> &#123; <span class="built_in">f</span>&lt;T&gt;(); &#125;;</span><br><span class="line"></span><br><span class="line"><span class="built_in">static_assert</span>(ok&lt;<span class="type">int</span>&gt;);</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://hopenobug.github.com/cpp26-reflection-practice/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -660,7 +737,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
