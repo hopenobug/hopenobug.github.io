@@ -28,7 +28,7 @@
 <meta property="og:description" content="ABI 是 应用二进制接口C++的ABI可以分为两个方面  语言ABI&#x2F;编译器ABI。 库的ABI（尤其是标准库的ABI）。  语言ABI&#x2F;编译器ABIC++由编译器决定的ABI主要包括：  名称修饰&#x2F;重整(Name mangling)：C++具有函数重载、模板、名称空间等，他们在目标文件中应该具有不同的名称，来让可执行文件可以调用到唯一的函数。将函数的名称变换为另一">
 <meta property="og:locale">
 <meta property="article:published_time" content="2026-09-25T04:20:30.000Z">
-<meta property="article:modified_time" content="2026-09-25T04:22:57.187Z">
+<meta property="article:modified_time" content="2026-09-25T05:04:23.627Z">
 <meta property="article:author" content="hopenobug">
 <meta name="twitter:card" content="summary">
 
@@ -217,7 +217,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2026-09-25 12:20:30 / 修改时间：12:22:57" itemprop="dateCreated datePublished" datetime="2026-09-25T12:20:30+08:00">2026-09-25</time>
+              <time title="创建时间：2026-09-25 12:20:30 / 修改时间：13:04:23" itemprop="dateCreated datePublished" datetime="2026-09-25T12:20:30+08:00">2026-09-25</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -259,7 +259,7 @@
 <ul>
 <li>MSVC使用的是STL（这里不是C++98的STL之意，但微软就起这个名字也没什么办法），具体到文件上就是msvcprtd。每个主要版本都会具有新的ABI，来尽快更新C++的新特性。根据微软官方文档，从VS2015(toolset v140)开始，MSVC保证后来版本的工具链总可以使用之前版本的ABI。</li>
 <li>GCC使用的是libstdc++，根据这个库的编写团队的成员所说，这个库在5.1&#x2F;7.1&#x2F;8,1&#x2F;9.1&#x2F;11.1都发生了ABI变化。比较有名的是5.1中<code>std::string</code>和<code>std::list</code>的ABI改变了（为了适应C++11关于COW的规定），造成在新编译器中链接之前的代码会运行崩溃，可以 使用<code>_GLIBCXX_USE_CXX11_ABI</code> 宏来切换 ABI。 </li>
-<li>Clang使用的是libc++，根据<a href="https://link.zhihu.com/?target=https://libcxx.llvm.org/DesignDocs/ABIVersioning.html">https://libcxx.llvm.org/DesignDocs/ABIVersioning.html</a>应该是只用2个ABI版本，可能快到3了。</li>
+<li>Clang使用的是libc++，根据 <a target="_blank" rel="noopener" href="https://libcxx.llvm.org/DesignDocs/ABIVersioning.html">https://libcxx.llvm.org/DesignDocs/ABIVersioning.html</a> 应该是只用2个ABI版本。</li>
 </ul>
 <p>这给库程序员造成很大的麻烦，因为C++程序员几乎不可避免使用标准库；如果要兼容所有版本，保险起见就需要每个ABI break的版本都提供新的库。如果想跨平台，还要考虑操作系统的问题；甚至可能需要考虑编译器选项的问题</p>
 <p>检查一个库是否使用c++11 新的ABI编译, 但如果库中没有使用std::string 则无法判断<br><code>nm -C liba.so | grep &quot;std::__cxx11::basic_string&lt;&quot;</code>  输出为空就是旧的ABI， 否则是新的ABI</p>
