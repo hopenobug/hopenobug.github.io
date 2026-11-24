@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"hopenobug.github.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="脚本地址：https:&#x2F;&#x2F;github.com&#x2F;hopenobug&#x2F;sparse-skill-install 问题安装 agent skills 的标准命令是： 1npx skills add user&#x2F;repo --skill code-review  它直接支持 GitHub 仓库和技能筛选。但对大多数仓库，CLI 内部会执行 git clone --depth 1，把整个仓库下载下来再从中挑">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用 git 稀疏克隆从大仓库中安装 skills">
+<meta property="og:url" content="https://hopenobug.github.com/sparse-skill-install/index.html">
+<meta property="og:site_name" content="个人博客">
+<meta property="og:description" content="脚本地址：https:&#x2F;&#x2F;github.com&#x2F;hopenobug&#x2F;sparse-skill-install 问题安装 agent skills 的标准命令是： 1npx skills add user&#x2F;repo --skill code-review  它直接支持 GitHub 仓库和技能筛选。但对大多数仓库，CLI 内部会执行 git clone --depth 1，把整个仓库下载下来再从中挑">
+<meta property="og:locale">
+<meta property="article:published_time" content="2026-11-24T10:22:02.000Z">
+<meta property="article:modified_time" content="2026-11-24T10:23:43.707Z">
+<meta property="article:author" content="hopenobug">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://hopenobug.github.com/sparse-skill-install/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>用 git 稀疏克隆从大仓库中安装 skills | 个人博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">个人博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://hopenobug.github.com/sparse-skill-install/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="hopenobug">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="个人博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          用 git 稀疏克隆从大仓库中安装 skills
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2026-11-24 18:22:02 / 修改时间：18:23:43" itemprop="dateCreated datePublished" datetime="2026-11-24T18:22:02+08:00">2026-11-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AI-Coding/" itemprop="url" rel="index"><span itemprop="name">AI Coding</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>脚本地址：<a target="_blank" rel="noopener" href="https://github.com/hopenobug/sparse-skill-install">https://github.com/hopenobug/sparse-skill-install</a></p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>安装 agent skills 的标准命令是：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx skills add user/repo --skill code-review</span><br></pre></td></tr></table></figure>
+
+<p>它直接支持 GitHub 仓库和技能筛选。但对大多数仓库，CLI 内部会执行 <code>git clone --depth 1</code>，把整个仓库下载下来再从中挑技能（<code>src/git.ts</code>）；如果仓库带子模块，还会递归拉取。只有少数白名单仓库（vercel、vercel-labs 等）走 GitHub API 的 blob 快速通道，跳过 clone。</p>
+<p>而技能仓库通常只有 <code>skills/</code> 目录是需要的：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">my-repo/</span><br><span class="line">├── docs/          # 几百页文档</span><br><span class="line">├── examples/      # 上百个示例</span><br><span class="line">├── src/           # 项目源码</span><br><span class="line">├── tests/</span><br><span class="line">└── skills/        # 我只需要这部分，几十 KB</span><br><span class="line">    ├── code-review/SKILL.md</span><br><span class="line">    ├── eli5/SKILL.md</span><br><span class="line">    └── ...</span><br></pre></td></tr></table></figure>
+
+<p>所以问题不在「能不能装」，而在下载量：装几个几十 KB 的技能，传输量却随整个仓库体积增长。</p>
+<h2 id="解决方案：sparse-checkout-partial-clone"><a href="#解决方案：sparse-checkout-partial-clone" class="headerlink" title="解决方案：sparse-checkout + partial clone"></a>解决方案：sparse-checkout + partial clone</h2><p>git 2.25 起支持 <a target="_blank" rel="noopener" href="https://git-scm.com/docs/git-sparse-checkout">sparse-checkout</a>，可以只 checkout 指定子目录。配合 <code>--filter=blob:none</code>（<a target="_blank" rel="noopener" href="https://git-scm.com/docs/partial-clone">partial clone</a>，blob 按需拉取），git 只下载声明的路径，对任意仓库可用：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> --no-checkout --depth 1 --filter=blob:none https://github.com/user/repo.git tmp</span><br><span class="line"><span class="built_in">cd</span> tmp</span><br><span class="line">git sparse-checkout init --cone</span><br><span class="line">git sparse-checkout <span class="built_in">set</span> skills/code-review   <span class="comment"># 只拉这个目录</span></span><br><span class="line">git checkout</span><br></pre></td></tr></table></figure>
+
+<p>各参数的作用：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--no-checkout</code></td>
+<td>clone 后不展开工作区，由后面的 sparse-checkout 控制</td>
+</tr>
+<tr>
+<td><code>--depth 1</code></td>
+<td>只要最新一次提交</td>
+</tr>
+<tr>
+<td><code>--filter=blob:none</code></td>
+<td>元数据照常下载，文件内容（blob）按需拉取</td>
+</tr>
+<tr>
+<td><code>sparse-checkout set</code></td>
+<td>声明需要的目录，checkout 时 git 才拉对应 blob</td>
+</tr>
+</tbody></table>
+<p>这样实际传输量只有需要的目录本身。</p>
+<h2 id="脚本"><a href="#脚本" class="headerlink" title="脚本"></a>脚本</h2><p>把上述命令封装，加上遍历目录、逐个调 <code>npx skills add</code>、退出时删除临时目录，就是 <a target="_blank" rel="noopener" href="https://github.com/hopenobug/sparse-skill-install">sparse-skill-install</a>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 装仓库里全部技能</span></span><br><span class="line">./sparse-skill-install.sh user/repo</span><br><span class="line"></span><br><span class="line"><span class="comment"># 只装两个</span></span><br><span class="line">./sparse-skill-install.sh user/repo --skill code-review --skill eli5</span><br></pre></td></tr></table></figure>
+
+<p>核心流程：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">clone_dir=$(<span class="built_in">mktemp</span> -d)</span><br><span class="line"><span class="built_in">trap</span> <span class="string">&#x27;rm -rf &quot;$clone_dir&quot;&#x27;</span> EXIT          <span class="comment"># 无论成败，退出时清理临时目录</span></span><br><span class="line"></span><br><span class="line">git <span class="built_in">clone</span> --no-checkout --depth 1 --filter=blob:none <span class="string">&quot;<span class="variable">$repo</span>&quot;</span> <span class="string">&quot;<span class="variable">$clone_dir</span>&quot;</span></span><br><span class="line"><span class="built_in">cd</span> <span class="string">&quot;<span class="variable">$clone_dir</span>&quot;</span></span><br><span class="line">git sparse-checkout init --cone</span><br><span class="line"></span><br><span class="line"><span class="comment"># 只拉选中的目录</span></span><br><span class="line">git sparse-checkout <span class="built_in">set</span> skills/code-review skills/eli5</span><br><span class="line">git checkout</span><br><span class="line"></span><br><span class="line"><span class="comment"># 逐个安装</span></span><br><span class="line">npx skills add ./skills/code-review/</span><br><span class="line">npx skills add ./skills/eli5/</span><br></pre></td></tr></table></figure>
+
+<p><code>user/repo</code> 会展开成 <code>https://github.com/user/repo.git</code>；无法识别的参数（比如 <code>--yes</code>）原样传给 <code>npx skills add</code>。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><code>npx skills add</code> 已经支持从 GitHub 仓库直接安装，仓库小的时候用它就够了；白名单仓库走 blob 通道也很快。这个脚本解决的是剩下一种情况：仓库很大、需要的只是其中 <code>skills/</code> 目录，不想为装技能下载整个仓库。</p>
+<p>git sparse-checkout 也适用于其他「只需要仓库中一部分文件」的场景：安装子目录里的工具、读取单个文档、引用示例代码。</p>
+<p>脚本约 100 行，依赖 bash、git ≥ 2.25、npx，完整用法说明见仓库 <a target="_blank" rel="noopener" href="https://github.com/hopenobug/sparse-skill-install#readme">README</a>。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/pi-todo-reminder/" rel="prev" title="pi-todo-reminder">
+      <i class="fa fa-chevron-left"></i> pi-todo-reminder
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%EF%BC%9Asparse-checkout-partial-clone"><span class="nav-number">2.</span> <span class="nav-text">解决方案：sparse-checkout + partial clone</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%84%9A%E6%9C%AC"><span class="nav-number">3.</span> <span class="nav-text">脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">hopenobug</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">hopenobug</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
